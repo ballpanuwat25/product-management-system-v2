@@ -1,5 +1,7 @@
 const express = require('express')
 const mysql = require('mysql2/promise')
+const sequelize = require('./config/db');
+const router = require('./routes/products');
 
 const app = express()
 const port = 8000
@@ -15,17 +17,12 @@ const initMySQL = async () => {
   })
 }
 
-app.get('/hello-world', (req, res) => {
-  res.send('hello world')
-})
+app.use(express.json())
 
-// path = GET /users สำหรับ get users ทั้งหมดที่บันทึกเข้าไปออกมา
-app.get('/users', async (req, res) => {
-  const [results] = await conn.query('SELECT * FROM users')
-  res.json(results)
-})
+app.use(router)
 
 app.listen(port, async () => {
   await initMySQL()
+  await sequelize.sync()
   console.log(`Server running at http://localhost:${port}/`)
 })
